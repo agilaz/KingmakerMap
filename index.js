@@ -17,11 +17,13 @@ io.on('connection', function(socket){
     console.log('New data:\n' + campaignData);
     socket.broadcast.emit('changing', campaignData);
   });
-  socket.on('hexUncover', function(hexInfo, hexInfoCover) {
-    console.log(hexInfo);
-    console.log(hexInfoCover);
-    console.log('Hex uncovered:\n' + hexInfo.x + ', ' + hexInfo.y);
-    socket.broadcast.emit('hexUncover', hexInfo, hexInfoCover);
+  socket.on('uncover hex', function(hexInfo) {
+    console.log('Hex uncovered: ' + hexInfo.x + ', ' + hexInfo.y);
+    socket.broadcast.emit('uncover hex', hexInfo);
+  });
+  socket.on('cover hex', function(hexInfo) {
+    console.log('Hex covered: ' + hexInfo.x + ', ' + hexInfo.y);
+    socket.broadcast.emit('cover hex', hexInfo);
   });
 });
 

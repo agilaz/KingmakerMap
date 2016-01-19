@@ -767,6 +767,7 @@ function snapIconPreview(snap) {
 
 
 //Server events
+//Generic events: import campaign data and reload page
 socket.on('changing', function (importData) {
 
         var name = current.importCampaign(importData);
@@ -779,11 +780,22 @@ socket.on('changing', function (importData) {
         location.reload();
 });
 
-socket.on('hexUncover', function(exploredHex, exploredHexCover) {
-  console.log(exploredHex);
-  console.log(exploredHexCover);
-  exploredHexCover.remove();
-  current.setExplored(exploredHex.x, exploredHex.y, true);
+//Hex uncovered
+socket.on('uncover hex', function(hex) {
+  //Get hexId to get cover; cover does not send properly over socket.io so has to be set locally
+  var hexId = current.getHexId(hex.x, hex.y);
+  var cover = $('#hex' + hexId);
+  console.log(hex);
+  console.log(cover);
+  cover.remove();
+  current.setExplored(hex.x, hex.y, true);
+});
+
+//Hex covered
+socket.on('cover hex', function(hex) {
+  current.setExplored(hex.x, hex.y, false);
+  cover($('#map'), hex.x, hex.y);
+  console.log(hex);
 });
 
 function makeMenus() {
@@ -839,16 +851,12 @@ function makeMenus() {
     });
     // unexploredMenu
     $('#reveal').click(function (evt) {
-        var hexCover = selectedHex.cover[0];
         console.log(selectedHex);
-        console.log(hexCover);
-        socket.emit('hexUncover', selectedHex, hexCover);
+        socket.emit('uncover hex', selectedHex);
         
         selectedHex.cover.remove();
         current.setExplored(selectedHex.x, selectedHex.y, true);
         
-        
-        //socket.emit('change', current.exportCampaign());
         close('#unexploredMenu', evt);
     });
     // markerMenu
@@ -887,8 +895,11 @@ function makeMenus() {
     $('#cover').click(function (evt) {
         current.setExplored(selectedHex.x, selectedHex.y, false);
         cover($('#map'), selectedHex.x, selectedHex.y);
+        
+        socket.emit('cover hex', selectedHex);
+        
         close('#exploredMenu', evt);
-        socket.emit('change', current.exportCampaign());
+        //socket.emit('change', current.exportCampaign());
     });
     // importExportDiv
     $('#importExportClose').click(function (evt) {
