@@ -780,8 +780,10 @@ socket.on('changing', function (importData) {
 });
 
 socket.on('hexUncover', function(exploredHex) {
+  console.log(exploredHex);
+  console.log(exploredHex.cover);
   exploredHex.cover.remove();
-  current.setExplored(selectedHex.x, selectedHex.y, true);
+  current.setExplored(exploredHex.x, exploredHex.y, true);
 });
 
 function makeMenus() {
@@ -838,7 +840,9 @@ function makeMenus() {
     $('#reveal').click(function (evt) {
         selectedHex.cover.remove();
         current.setExplored(selectedHex.x, selectedHex.y, true);
-        socket.emit('hexUncover', selectedHex)
+        console.log(selectedHex);
+        console.log(selectedHex.cover);
+        socket.emit('hexUncover', selectedHex);
         //socket.emit('change', current.exportCampaign());
         close('#unexploredMenu', evt);
     });
