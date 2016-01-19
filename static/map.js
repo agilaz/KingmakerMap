@@ -801,9 +801,10 @@ socket.on('cover hex', function(hex) {
 //Party moved
 socket.on('move party', function(partyCoords) {
   current.setPartyCoords(partyCoords.x, partyCoords.y);
-  party.offset({ left: partyCoords.x, top: partyCoords.y });
+  party.setAttribute("style", "top: " + String(partyCoords.y) + "px; left: " + String(partyCoords.x-$('#map').offset()) + "px;");
   console.log(partyCoords);
 });
+
 function makeMenus() {
     //Make menus, send info from client
     // Top level menu
