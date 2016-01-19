@@ -1,0 +1,222 @@
+
+#map {
+    position: absolute;
+    left: 100px;
+    top: 0;
+    overflow: hidden;
+}
+
+.wait {
+    display: none;
+}
+
+.cover {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.selectedHex {
+    opacity: 0.7;
+}
+
+#icons {
+    width: 100px;
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding-top: 10px;
+    padding-left: 5px;
+    background-color: white;
+}
+
+.icon {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    z-index: 10;
+    position: relative;
+}
+
+.icon img {
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    max-width: 98px;
+    max-height: 98px;
+}
+
+#party {
+    z-index: 30;
+    position: absolute;
+}
+
+.marker {
+    position: absolute;
+    z-index: 20;
+}
+
+.marker img {
+    cursor: pointer;
+}
+
+.markerText {
+    font-size: 16pt;
+    font-weight: bold;
+    text-shadow: -2px -2px 1px #fff, 2px -2px 1px #fff, 2px 2px 1px #fff, -2px 2px 1px #fff;
+    position: absolute;
+    cursor: default;
+    width: 200px;
+}
+
+.right {
+    left: 100%;
+    padding-left: 3px;
+}
+
+.left {
+    right: 100%;
+    text-align: right;
+    padding-right: 3px;
+}
+
+.above {
+    bottom: 100%;
+    text-align: center;
+    left: 50%;
+    margin-left: -100px;
+}
+
+.below {
+    top: 100%;
+    text-align: center;
+    left: 50%;
+    margin-left: -100px;
+}
+
+.noLabel {
+    display: none;
+}
+
+.floatingMenu {
+    display: none;
+    position: absolute;
+    border: 1px solid black;
+    background-color: white;
+    padding: 5px;
+    z-index: 101;
+    font-size: 20pt;
+}
+
+.floatingMenu a {
+    display: block;
+}
+
+.floatingMenu a + a {
+    padding-top: 1em;
+}
+
+#menu {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#mainMenu {
+    margin-left: 50px;
+    top: 5px;
+}
+
+#mapConfiguration {
+    left: 400px;
+    top: 100px;
+}
+
+.scalingHex {
+    position: absolute;
+    z-index: 101;
+    display: none;
+}
+
+#importExportDiv {
+    display: none;
+    z-index: 101;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    position: absolute;
+}
+
+#importExportDiv textarea {
+    margin: 2em;
+    width: 90%;
+    height: 20em;
+}
+
+#iconConfigurationDiv {
+    display: none;
+    z-index: 101;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    position: absolute;
+}
+
+#iconPreviewDiv {
+    position: absolute;
+    left: 300px;
+    background: black;
+}
+
+#iconPreview {
+    position: absolute;
+}
+
+#previewScale {
+    width: 100%;
+    z-index: 10;
+    position: relative;
+}
+
+.snapCheckbox {
+    background: white;
+    width: 100%;
+    text-align: center;
+}
+
+#iconPanel {
+    margin-left: 100px;
+    padding: 10px;
+    border: 1px solid black;
+    width: 100px;
+}
+
+.pendingDeleteIcon {
+    opacity: 0.5;
+}
+
+.cancelButton {
+    margin-left: 100px;
+}
+
+label {
+    height: 50px;
+    display: inline-block;
+    padding: 0 10px;
+}
+
+.dragHandle {
+    height: 2em;
+    background-color: #bbb;
+    cursor: pointer;
+}
+
+.horizontalHexes .verticalHexes, .verticalHexes .horizontalHexes {
+    display: none;
+}
+

@@ -7,7 +7,7 @@ $(function(){
 	}
 
 	// The URL of your web server (the port is set in app.js)
-	var url = 'http://aqueous-island-9658.herokuapp.com/';
+	var url = 'http://localhost:5000';
 
 	var doc = $(document),
 		win = $(window),

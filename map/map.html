@@ -1,0 +1,175 @@
+<HTML>
+
+<head>
+    <title>HTHS Kingmaker Map</title>
+    <link rel="stylesheet" type="text/css" href="map.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <!-- <script language="javascript" src="jquery-1.7.2.min.js"></script> -->
+    <script language="javascript" src="map.js"></script>
+</head>
+
+<body>
+
+<div class="floatingMenu fixedX" id="mainMenu">
+    <p>Switch to campaign:</p>
+    <div id="campaignDiv"></div>
+    <hr/>
+    <a id="newCampaign" href="#">New Campaign</a>
+    <a id="deleteCampaign" href="#">Delete Campaign</a>
+    <a id="importExport" href="#">Import/Export Campaign</a>
+    <hr/>
+    <a id="configureMap" href="#">Map Configuration</a>
+    <a id="configureIcons" href="#">Modify Available Icons</a>
+</div>
+
+<div id="importExportDiv" class="fixedX">
+    <p>Copy and paste into and out of this text area to export the current campaign or import a new or existing campaign</p>
+    <textarea name="importExportArea"></textarea><br/>
+    <button id="importButton">Import above campaign data</button>
+    <button class="cancelButton" id="importExportClose">Cancel</button>
+</div>
+
+<div id="iconConfigurationDiv" class="fixedX">
+    <p>Re-arrange icons here.  Drag them outside the panel to delete.</p>
+    <div id="iconPreviewDiv">
+	<img id="iconPreviewHex" src="hex.png" />
+	<img id="iconPreview" src="empty.png" /> <br/>
+	<input type="range" id="previewScale" /> <br/>
+	<label class="snapCheckbox"><input type="checkbox" id="snapToHex" /> Snap to hex</label>
+    </div>
+    <div id="iconPanel"> </div>
+    <button id="addIconButton">Add Icon from web: </button>
+    <input type="text" id="newIconSrc" size="50" />
+    <p>Or add canned icon:
+        <select id="iconSelect">
+            <option value=""></option>
+            <option value="icon_none.png">No Icon (just label)</option>
+            <option value="tick.png">Explored Hex</option>
+            <option value="crown.png">Claimed Hex</option>
+            <option value="icon_bridge.png">Bridge</option>
+            <option value="icon_building.png">Building</option>
+            <option value="icon_camp.png">Camp</option>
+            <option value="icon_city.png">City</option>
+            <option value="icon_farm.png">Farmlands</option>
+            <option value="icon_grave.png">Grave</option>
+            <option value="icon_hut.png">Hut</option>
+            <option value="icon_mine.png">Mine</option>
+            <option value="icon_monster.png">Monster</option>
+            <option value="icon_POI.png">Point of Interest</option>
+            <option value="icon_resource.png">Resource</option>
+            <option value="icon_ruin.png">Ruin</option>
+            <option value="icon_pin.png">Stick Pin</option>
+            <option value="icon_temple.png">Temple</option>
+            <option value="icon_tower.png">Tower</option>
+            <option value="icon_town.png">Town</option>
+            <option value="road_east.png">Road - East/West</option>
+            <option value="road_north.png">Road - North/South</option>
+            <option value="road_northeast.png">Road - Northeast/Southwest</option>
+            <option value="road_southeast.png">Road - Southeast/Northwest</option>
+        </select>
+    </p>
+    <br/>
+    <button id="finishIcon">Finish</button>
+    <button class="cancelButton" id="cancelIcon">Cancel</button>
+</div>
+
+<div class="floatingMenu" id="mapConfiguration">
+    <div class="dragHandle"> </div>
+    <div>
+        <strong>Map source file from the web:</strong>
+        <input type="text" id="mapSrc" size="50" />
+        <p>... or use one of the canned maps:
+            <select id="mapSelect">
+                <option value=""></option>
+                <option value="The_Greenbelt_sq.jpg">The Greenbelt</option>
+                <option value="The_Greenbelt.jpg">The Greenbelt (square)</option>
+                <option value="Nomen_Heights.jpg">Nomen Heights</option>
+                <option value="Greenbelt_NomenHeights.jpg">Greenbelt + Nomen Heights</option>
+                <option value="Greenbelt_NomenHeights_sq.jpg">Greenbelt + Nomen Heights (square)</option>
+                <option value="HooktongueSlough_Greenbelt_NomenHeights_sq.jpg">Hooktongue Slough + Greenbelt + Nomen Heights</option>
+            </select>
+        </p>
+    </div>
+    <p><label><input type="checkbox" id="verticalHexes"> Hexes in vertical columns</label></p>
+    <p>What is the map size required to include both the red and blue hexes?</p>
+    <div id="dimensionsInput" class="horizontalHexes">
+	<p>
+	    <strong>Map width in hexes:</strong>
+	    <input type="text" id="mapWidth" />
+	    <span class="horizontalHexes">(halves are legal)</span>
+	    <span class="verticalHexes">(whole numbers only)</span>
+	</p>
+	<p>
+	    <strong>Map height in hexes:</strong>
+	    <input type="text" id="mapHeight" />
+	    <span class="horizontalHexes">(whole numbers only)</span>
+	    <span class="verticalHexes">(halves)</span>
+	</p>
+    </div>
+    <p><label><input type="checkbox" id="halfHex"> Shift cover by half a hex</label></p>
+
+    <p>Drag the red hex to cover the top-left hex of the map.</p>
+    <p>Drag the blue hex to cover the bottom-right hex of the map.</p>
+    <p><label><input type="checkbox" id="shiftOrigin"> Also adjust origin of map icons with the white hex.</label></p>
+    <button id="finishConfiguration">Finish</button>
+    <button class="cancelButton" id="cancelConfiguration">Cancel</button>
+</div>
+
+<div id="icons" class="fixedX">
+    <p>Version 3</p>
+    <div id="menu">Menu</div>
+    <center><h3 id="campaign"></h3></center>
+    <div id="iconDiv"> </div>
+</div>
+
+<div id="map">
+    <img class="wait" id="mapImg" />
+    <img class="scalingHex" id="redHex" src="redHex.png" />
+    <img class="scalingHex" id="blueHex" src="blueHex.png" />
+    <img class="scalingHex" id="originHex" src="hex.png" />
+    <img id="party" src="pawn.png" title="Party" />
+    <div class="floatingMenu" id="unexploredMenu">
+	<a id="reveal" href="#">Reveal Hex</a>
+    </div>
+    <div class="floatingMenu" id="exploredMenu">
+	<a id="cover" href="#">Cover Hex</a>
+    </div>
+    <div class="floatingMenu" id="markerMenu">
+	<h4 id="markerMenuTitle"></h4>
+	<a id="move" href="#">Move</a>
+  <a id="editLabel" href="#">Edit Label</a>
+	<a id="lower" href="#">Lower under other markers</a>
+	<a id="copy" href="#">Copy</a>
+	<a id="remove" href="#">Remove</a>
+    </div>
+    <div class="floatingMenu" id="titleEditor">
+	<p>Enter the new title below</p>
+	<textarea id="newTitle" rows=4 cols=40>
+	</textarea>
+	<p>Set the side the label appears:</p>
+	<table>
+	    <tr>
+		<td></td>
+		<td><label><input type="radio" name="textSide" value="above"> Above</label></td>
+		<td></td>
+	    </tr>
+	    <tr>
+		<td><label><input type="radio" name="textSide" value="left"> Left</label></td>
+		<td><label><input type="radio" name="textSide" value="noLabel"> No label</label></td>
+		<td><label><input type="radio" name="textSide" value="right"> Right</label></td>
+	    </tr>
+	    <tr>
+		<td></td>
+		<td><label><input type="radio" name="textSide" value="below"> Below</label></td>
+		<td></td>
+	    </tr>
+	</table>
+	<button id="finishLabel">Finish</button>
+	<button class="cancelButton" id="cancelLabel">Cancel</button>
+    </div>
+    <div id="markerDiv"> </div>
+</div>
+
+</body>
+</html>
