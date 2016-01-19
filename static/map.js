@@ -497,12 +497,22 @@ var Campaign = Class.create({
     },
 
     removeMarker: function (marker) {
-        var index = $.inArray(marker, this.markerList);
+        /*var index = $.inArray(marker, this.markerList);
         if (index >= 0) {
             this.markerList.splice(index, 1);
             this.saveMarkers();
         } else if (console) {
             console.error('failed to remove ' + marker);
+        }*/
+        for(var i = 0; i < this.markerList.length; i++) {
+          if(JSON.stringify(this.markerList[i]) === JSON.stringify(marker)) {
+            this.markerList.splice(i,1);
+            this.saveMarkers();
+            return;
+          }
+        }
+        if (console) {
+          console.error('failed to remove ' + marker);
         }
     },
 
@@ -801,7 +811,7 @@ socket.on('cover hex', function(hex) {
 //Party moved
 socket.on('move party', function(partyCoords) {
   current.setPartyCoords(partyCoords.x, partyCoords.y);
-  party.setAttribute("style", "top: " + String(partyCoords.y) + "px; left: " + String(partyCoords.x-$('#map').offset()/*.left*/) + "px;");
+  party.setAttribute("style", "top: " + String(partyCoords.y) + "px; left: " + String(partyCoords.x-$('#map').offset().left) + "px;");
   console.log(partyCoords);
 });
 
