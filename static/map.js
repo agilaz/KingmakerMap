@@ -766,7 +766,7 @@ function snapIconPreview(snap) {
 }
 
 
-
+//Server events
 socket.on('changing', function (importData) {
 
         var name = current.importCampaign(importData);
@@ -777,6 +777,11 @@ socket.on('changing', function (importData) {
             // manager.set('campaignList', campaignList);
         // }
         location.reload();
+});
+
+socket.on('hexUncover', function(exploredHex) {
+  exploredHex.cover.remove();
+  current.setExplored(selectedHex.x, selectedHex.y, true);
 });
 
 function makeMenus() {
@@ -833,7 +838,8 @@ function makeMenus() {
     $('#reveal').click(function (evt) {
         selectedHex.cover.remove();
         current.setExplored(selectedHex.x, selectedHex.y, true);
-        socket.emit('change', current.exportCampaign());
+        socket.emit('hexUncover', selectedHex)
+        //socket.emit('change', current.exportCampaign());
         close('#unexploredMenu', evt);
     });
     // markerMenu

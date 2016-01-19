@@ -3,22 +3,23 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-app.use(express.static(__dirname + '/map'));
+app.use(express.static(__dirname + '/static'));
 
 app.get('/', function(req, res){
-  console.log(__dirname);
-  res.sendFile(__dirname + '/map/map.html');
+  res.sendFile(__dirname + '/static/map.html');
 });
 
-app.get('/map.js', function(req, res) {
-  res.sendFile(__dirname + '/map.js');
-});
+
 
 io.on('connection', function(socket){
   console.log('user connected');
   socket.on('change', function(campaignData){
     console.log('New data:\n' + campaignData);
     socket.broadcast.emit('changing', campaignData);
+  });
+  socket.on('hexUncover', function(hexInfo) {
+    console.log('Hex uncovered:\n' + hexInfo.x + ', ' + hexInfo.y);
+    socket.broadcast.emit('hexUncover', hexInfo);
   });
 });
 
