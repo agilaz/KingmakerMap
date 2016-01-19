@@ -25,6 +25,10 @@ io.on('connection', function(socket){
     console.log('Hex covered: ' + hexInfo.x + ', ' + hexInfo.y);
     socket.broadcast.emit('cover hex', hexInfo);
   });
+  socket.on('move party', function(partyCoords) {
+    console.log('Party moved: ' + partyCoords.x + ', ' + partyCoords.y);
+    socket.broadcast.emit('move party', partyCoords);
+  })
 });
 
 http.listen(process.env.PORT || 5000, function(){

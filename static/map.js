@@ -798,6 +798,12 @@ socket.on('cover hex', function(hex) {
   console.log(hex);
 });
 
+//Party moved
+socket.on('move party', function(partyCoords) {
+  current.setPartyCoords(partyCoords.x, partyCoords.y);
+  party.offset({ left: partyCoords.x, top: partyCoords.y });
+  console.log(partyCoords);
+});
 function makeMenus() {
     //Make menus, send info from client
     // Top level menu
@@ -1218,12 +1224,14 @@ function addHandlers() {
     });
     // Handler for party marker
     var party = $('#party');
-    party.makeDraggable({ drag: function (x, y) { current.setPartyCoords(x, y); } });
+    party.makeDraggable({ drag: function (x, y) { current.setPartyCoords(x, y); console.log(x + ' ' + y);
+    socket.emit('move party', {x: x, y: y});} });
     party.click(function (evt) {
         evt.preventDefault();
         evt.stopPropagation();
     });
     party.offset({ left: current.partyX, top: current.partyY });
+    
 }
 
 function deleteCampaign(element, name) {
