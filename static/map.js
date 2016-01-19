@@ -344,6 +344,7 @@ var Marker = Class.create({
             this.setAngle(this.angle);
             this.marker.css({ left: this.x, top: this.y });
             this.marker.data('marker', this);
+            console.log(this.marker);
         }
         return this.marker;
     },
@@ -495,7 +496,19 @@ var Campaign = Class.create({
         this.markerList.splice(0, 0, marker);
         this.saveMarkers();
     },
-
+    
+    getMarker: function (marker) {
+      var markerString = marker.x + ',' + marker.y + ',' + marker.angle + ',' + marker.src + ',' + marker.textSide + ',' + marker.title
+      for(var i = 0; i < this.markerList.length; i++) {
+        console.log(this.markerList[i].toString());
+        if(this.markerList[i].toString() == markerString) {
+          return this.markerList[i];
+        }
+      }
+      if (console) {
+        console.error('failed to get ' + marker);
+      }
+    },
     removeMarker: function (marker) {
         /*var index = $.inArray(marker, this.markerList);
         if (index >= 0) {
@@ -504,8 +517,12 @@ var Campaign = Class.create({
         } else if (console) {
             console.error('failed to remove ' + marker);
         }*/
+        var markerString = marker.x + ',' + marker.y + ',' + marker.angle + ',' + marker.src + ',' + marker.textSide + ',' + marker.title
+        console.log(markerString);
+        
         for(var i = 0; i < this.markerList.length; i++) {
-          if(JSON.stringify(this.markerList[i]) === JSON.stringify(marker)) {
+          console.log(this.markerList[i].toString());
+          if(this.markerList[i].toString() == markerString) {
             this.markerList.splice(i,1);
             this.saveMarkers();
             return;
@@ -817,13 +834,18 @@ socket.on('move party', function(partyCoords) {
 
 //Marker changed
 socket.on('remove marker', function(oldMarker) {
+  var fixedMarker = current.getMarker(oldMarker);
   console.log(oldMarker);
   current.removeMarker(oldMarker);
+  console.log(fixedMarker.getElement());
+  fixedMarker.getElement().remove();
 });
 
 socket.on('add marker', function(newMarker) {
-  console.log(newMarker);
-  current.addMarker(newMarker);
+  var fixedMarker = new Marker(newMarker.x + ',' + newMarker.y + ',' + newMarker.angle + ',' + newMarker.src + ',' + newMarker.textSide + ',' + newMarker.title);
+  console.log(fixedMarker);
+  current.addMarker(fixedMarker);
+  $('#markerDiv').append(fixedMarker.getElement());
 });
 
 function makeMenus() {
@@ -913,13 +935,12 @@ function makeMenus() {
     $('#copy').click(function (evt) {
         dragMarker(new Marker(selectedMarker), -10, -10);
         close('#markerMenu', evt);
-        socket.emit('change', current.exportCampaign());
     });
     $('#remove').click(function (evt) {
         current.removeMarker(selectedMarker);
+        socket.emit('remove marker', selectedMarker);
         selectedMarker.getElement().remove();
         close('#markerMenu', evt);
-        socket.emit('change', current.exportCampaign());
     });
     // exploredMenu
     $('#cover').click(function (evt) {
@@ -991,12 +1012,14 @@ function makeMenus() {
     // titleEditor
     $('#finishLabel').click(function (evt) {
         var newTitle = $('#newTitle').val().replace(/[\r\n]+/g, '<br/>');
+        socket.emit('remove marker', selectedMarker);
         selectedMarker.setTitle(newTitle);
         var textSide = $('input:radio[name=textSide]:checked').val();
         selectedMarker.setTextSide(textSide);
 	var angle = $('#labelAngle').val();
         selectedMarker.setAngle(angle);
         current.saveMarkers();
+        socket.emit('add marker', selectedMarker);
         close('#titleEditor', evt);
     });
     $('#cancelLabel').click(function (evt) {
