@@ -1,0 +1,3 @@
+## Kingmaker Map
+
+A modified version of [RobRendell's interactive Kingmaker map](http://paizo.com/threads/rzs2q3im?Greetings-and-some-webbased-tools-I-wrote), a utility used for assisting with hexploration in the Pathfinder adventure path Kingmaker. Uses node.js, express, socket.io to allow multiple users to concurrently view and edit the map. Very quick and dirty (but functional) code, can be hosted on Heroku or similar services.
