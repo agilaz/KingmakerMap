@@ -779,14 +779,15 @@ socket.on('changing', function (importData) {
         location.reload();
 });
 
-socket.on('hexUncover', function(exploredHex) {
+socket.on('hexUncover', function(exploredHex, exploredHexCover) {
   console.log(exploredHex);
-  console.log(exploredHex.cover);
-  exploredHex.cover.remove();
+  console.log(exploredHexCover);
+  exploredHexCover.remove();
   current.setExplored(exploredHex.x, exploredHex.y, true);
 });
 
 function makeMenus() {
+    //Make menus, send info from client
     // Top level menu
     $('#menu').click(function (evt) {
         if (!closeAnyMenu()) {
@@ -838,11 +839,15 @@ function makeMenus() {
     });
     // unexploredMenu
     $('#reveal').click(function (evt) {
+        var hexCover = selectedHex.cover[0];
+        console.log(selectedHex);
+        console.log(hexCover);
+        socket.emit('hexUncover', selectedHex, hexCover);
+        
         selectedHex.cover.remove();
         current.setExplored(selectedHex.x, selectedHex.y, true);
-        console.log(selectedHex);
-        console.log(selectedHex.cover);
-        socket.emit('hexUncover', selectedHex);
+        
+        
         //socket.emit('change', current.exportCampaign());
         close('#unexploredMenu', evt);
     });

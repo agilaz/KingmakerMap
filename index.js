@@ -17,11 +17,11 @@ io.on('connection', function(socket){
     console.log('New data:\n' + campaignData);
     socket.broadcast.emit('changing', campaignData);
   });
-  socket.on('hexUncover', function(hexInfo) {
+  socket.on('hexUncover', function(hexInfo, hexInfoCover) {
     console.log(hexInfo);
-    console.log(hexInfo.cover);
+    console.log(hexInfoCover);
     console.log('Hex uncovered:\n' + hexInfo.x + ', ' + hexInfo.y);
-    socket.broadcast.emit('hexUncover', hexInfo);
+    socket.broadcast.emit('hexUncover', hexInfo, hexInfoCover);
   });
 });
 
