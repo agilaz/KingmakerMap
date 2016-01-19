@@ -801,8 +801,19 @@ socket.on('cover hex', function(hex) {
 //Party moved
 socket.on('move party', function(partyCoords) {
   current.setPartyCoords(partyCoords.x, partyCoords.y);
-  party.setAttribute("style", "top: " + String(partyCoords.y) + "px; left: " + String(partyCoords.x-$('#map').offset()) + "px;");
+  party.setAttribute("style", "top: " + String(partyCoords.y) + "px; left: " + String(partyCoords.x-$('#map').offset()/*.left*/) + "px;");
   console.log(partyCoords);
+});
+
+//Marker changed
+socket.on('remove marker', function(oldMarker) {
+  console.log(oldMarker);
+  current.removeMarker(oldMarker);
+});
+
+socket.on('add marker', function(newMarker) {
+  console.log(newMarker);
+  current.addMarker(newMarker);
 });
 
 function makeMenus() {
@@ -876,6 +887,8 @@ function makeMenus() {
     });
     $('#move').click(function (evt) {
         current.removeMarker(selectedMarker);
+        socket.emit('remove marker', selectedMarker);
+        console.log(selectedMarker);
         dragMarker(selectedMarker, -10, -10);
         close('#markerMenu', evt);
         //socket.emit('change', current.exportCampaign());
@@ -1070,7 +1083,8 @@ function dragMarker(marker, dx, dy) {
             element.remove();
         }
         preventTouchScroll = false;
-        socket.emit('change', current.exportCampaign());
+        socket.emit('add marker', marker);
+        console.log(marker);
     });
     
     

@@ -28,7 +28,15 @@ io.on('connection', function(socket){
   socket.on('move party', function(partyCoords) {
     console.log('Party moved: ' + partyCoords.x + ', ' + partyCoords.y);
     socket.broadcast.emit('move party', partyCoords);
-  })
+  });
+  socket.on('remove marker', function(oldMarker) {
+    console.log('Marker removed: ' + oldMarker);
+    socket.broadcast.emit('remove marker', oldMarker);
+  });
+  socket.on('add marker', function(newMarker) {
+    console.log('Marker added: ' + newMarker);
+    socket.broadcast.emit('add marker', newMarker);
+  });
 });
 
 http.listen(process.env.PORT || 5000, function(){
