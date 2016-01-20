@@ -1,11 +1,11 @@
 <HTML>
 
 <head>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="shortcut icon" href="https://hthskingmaker.herokuapp.com/favicon.ico">
     <title>HTHS Kingmaker Map</title>
     <link rel="stylesheet" type="text/css" href="map.css" />
     <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
     <!-- <script language="javascript" src="jquery-1.7.2.min.js"></script> -->
     <script language="javascript" src="map.js"></script>
 </head>
@@ -125,7 +125,7 @@
 </div>
 
 <div id="map">
-    <img class="wait" id="mapImg" />
+    <img class="wait" id="mapImg" draggable="false"/>
     <img class="scalingHex" id="redHex" src="redHex.png" />
     <img class="scalingHex" id="blueHex" src="blueHex.png" />
     <img class="scalingHex" id="originHex" src="hex.png" />
@@ -172,4 +172,11 @@
     <div id="markerDiv"> </div>
 </div>
 </body>
+<!-- <script>
+document.getElementById("mapImg").addEventListener("dragstart", function(e) {
+    var img = document.createElement("img");
+    img.src = "drag.jpg";
+    e.dataTransfer.setDragImage(img, -10, -10);
+}, false);
+</script> -->
 </html>

@@ -2,7 +2,7 @@ String.prototype.toId = function() {
     return this.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-var url = "http://hthskingmaker.herokuapp.com/";
+var url = "https://hthskingmaker.herokuapp.com/";
 var socket = io.connect(url);
 
 var editing = false;
@@ -745,7 +745,7 @@ function cover(mapDiv, straight, zigzag) {
 
 function coverMap() {
     $('#mapImg').attr('src', current.mapSrc);
-    $('#mapImg').attr('draggable','false');
+    //$('#mapImg').attr('draggable','false');
     var zigzagDelta = (current.halfHex ? 1 : 0);
     for (var zigzag = zigzagDelta - 1; zigzag <= current.mapMaxZigzag + 1 + zigzagDelta; ++zigzag) {
 	for (var straight = -(zigzag&1); straight <= current.mapMaxStraight; straight += 2) {
@@ -1797,7 +1797,7 @@ $(document).ready(function () {
     addHandlers();
     makeIcons();
     coverMap();
-    $('#mapImg').attr('draggable','false');
+    //$('#mapImg').attr('draggable','false');
     fixMenuX();
     // socket.emit('need sync');
     // console.log('getting help');
