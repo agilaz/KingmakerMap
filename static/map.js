@@ -745,6 +745,7 @@ function cover(mapDiv, straight, zigzag) {
 
 function coverMap() {
     $('#mapImg').attr('src', current.mapSrc);
+    $('#mapImg').attr('draggable','false');
     var zigzagDelta = (current.halfHex ? 1 : 0);
     for (var zigzag = zigzagDelta - 1; zigzag <= current.mapMaxZigzag + 1 + zigzagDelta; ++zigzag) {
 	for (var straight = -(zigzag&1); straight <= current.mapMaxStraight; straight += 2) {
@@ -795,7 +796,7 @@ function snapIconPreview(snap) {
 
 //Server events
 //Generic events: import campaign data and reload page
-socket.on('changing', function (importData) {
+socket.on('import', function (importData) {
 
         var name = current.importCampaign(importData);
         manager.set('campaign', name);
@@ -805,6 +806,11 @@ socket.on('changing', function (importData) {
             // manager.set('campaignList', campaignList);
         // }
         location.reload();
+});
+
+socket.on('help sync', function() {
+  socket.emit('helping', current.exportCampaign());
+  console.log('helping');
 });
 
 //Hex uncovered
@@ -930,7 +936,7 @@ function makeMenus() {
         current.prependMarker(selectedMarker);
         $('#markerDiv').prepend(selectedMarker.getElement());
         close('#markerMenu', evt);
-        socket.emit('change', current.exportCampaign());
+        socket.emit('import', current.exportCampaign());
     });
     $('#copy').click(function (evt) {
         dragMarker(new Marker(selectedMarker), -10, -10);
@@ -966,7 +972,7 @@ function makeMenus() {
             campaignList.push(name);
             manager.set('campaignList', campaignList);
         }
-        socket.emit('change', current.exportCampaign());
+        socket.emit('import', current.exportCampaign());
         location.reload();
     });
     // iconConfigurationDiv
@@ -1791,7 +1797,10 @@ $(document).ready(function () {
     addHandlers();
     makeIcons();
     coverMap();
+    $('#mapImg').attr('draggable','false');
     fixMenuX();
+    socket.emit('need sync');
+    console.log('getting help');
     setTimeout(function () {
         $('.wait').show();
     }, 500);
