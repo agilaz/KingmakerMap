@@ -808,10 +808,10 @@ socket.on('import', function (importData) {
         location.reload();
 });
 
-socket.on('help sync', function() {
-  socket.emit('helping', current.exportCampaign());
-  console.log('helping');
-});
+// socket.on('help sync', function() {
+  // socket.emit('helping', current.exportCampaign());
+  // console.log('helping');
+// });
 
 //Hex uncovered
 socket.on('uncover hex', function(hex) {
@@ -1799,8 +1799,8 @@ $(document).ready(function () {
     coverMap();
     $('#mapImg').attr('draggable','false');
     fixMenuX();
-    socket.emit('need sync');
-    console.log('getting help');
+    // socket.emit('need sync');
+    // console.log('getting help');
     setTimeout(function () {
         $('.wait').show();
     }, 500);
