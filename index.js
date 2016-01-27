@@ -13,20 +13,30 @@ app.get('/', function(req, res){
 var clients = [];
 
 io.on('connection', function(socket){
-  //var helpId;
+  var helpId;
+  var latestInfo;
+  var syncNeededData = [];
   console.log('user connected');
-  // socket.on('need sync', function() {
-    // helpId = clients.length;
-    // console.log('need sync for: ' + helpId);
-    // if(clients.length > 0) {
-      // console.log('help from: ' + clients[0].id);
-      // clients[0].emit('help sync');
-    // }
-    // clients.push(socket);
-  // });
-  // socket.on('helping', function(campaignData) {
-    // if(helpId) clients[helpId].emit('import', campaignData);
-  // });
+  socket.on('need sync', function(currentData) {
+    syncNeededData.push(currentData);
+    console.log('need sync for:\n' + syncNeededData);
+    helpId = clients.length;
+    console.log('need sync for: ' + helpId);
+    if(clients.length > 0) {
+      console.log('help from: ' + clients[0].id);
+      clients[0].emit('help sync');
+    }
+    clients.push(socket);
+  });
+  socket.on('helping', function(campaignData) {
+    console.log(syncNeededData);
+    console.log('overwriting: ' + helpId + '\n' + syncNeededData[helpId]);
+    console.log('sending: \n' + campaignData);
+    if (campaignData != syncNeededData) {
+      console.log('sending import data to ' + helpId);
+      clients[helpId].emit('import', campaignData);
+    } 
+  });
   
   socket.on('import', function(campaignData){
     console.log('New data:\n' + campaignData);
