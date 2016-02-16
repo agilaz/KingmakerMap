@@ -13,23 +13,24 @@ app.get('/', function(req, res){
 var clients = [];
 
 io.on('connection', function(socket){
-  var helpId;
+  
   var latestInfo;
   var syncNeededData = [];
   console.log('user connected');
   socket.on('need sync', function(currentData) {
+    var helpId;
     syncNeededData.push(currentData);
-    console.log('need sync for:\n' + syncNeededData);
     helpId = clients.length;
-    console.log('need sync for: ' + helpId);
-    if(clients.length > 0) {
-      console.log('help from: ' + clients[0].id);
-      clients[0].emit('help sync');
-    }
+    console.log('need sync for: ' +helpId + '\n' + syncNeededData);
     clients.push(socket);
+    if(clients.length > 1) {
+      console.log('help from: ' + clients[0].id);
+      clients[0].emit('help sync', helpId);
+    }
+    
   });
-  socket.on('helping', function(campaignData) {
-    console.log(syncNeededData);
+  socket.on('helping', function(campaignData, helpId) {
+    //console.log(syncNeededData);
     console.log('overwriting: ' + helpId + '\n' + syncNeededData[helpId]);
     console.log('sending: \n' + campaignData);
     if (campaignData != syncNeededData) {

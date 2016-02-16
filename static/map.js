@@ -808,8 +808,8 @@ socket.on('import', function (importData) {
         location.reload();
 });
 
-socket.on('help sync', function() {
-  socket.emit('helping', current.exportCampaign());
+socket.on('help sync', function(helpId) {
+  socket.emit('helping', current.exportCampaign(), helpId);
   console.log('helping');
 });
 
