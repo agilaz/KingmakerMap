@@ -1,0 +1,8 @@
+Name:Kingmaker
+explored:6_0|8_0|10_0|12_0|14_0|9_1|11_3|8_2|10_2|7_1|6_2|5_1
+iconImages:icon_pin.png|icon_building.png|icon_POI.png|icon_camp.png|icon_bridge.png|icon_monster.png|icon_mine.png|icon_resource.png|icon_temple.png|icon_ruin.png|icon_grave.png|tick.png|icon_hut.png
+iconSnap:{}
+iconZoom:{}
+markers:898,107,0,icon_building.png,below,Oleg's Trading Post|NaN,NaN,0,undefined,right,|1029,269,0,icon_monster.png,below,Spider|717,105,0,icon_pin.png,below,FAAAAEEEE|841,311,0,icon_resource.png,above,Radish Patch
+party:1049,96
+version:2

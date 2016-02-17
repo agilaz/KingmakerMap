@@ -808,10 +808,14 @@ socket.on('import', function (importData) {
         location.reload();
 });
 
-socket.on('help sync', function(helpId) {
-  socket.emit('helping', current.exportCampaign(), helpId);
-  console.log('helping');
+socket.on('export', function () {
+  console.log('exporting:\n' + current.exportCampaign());
+  socket.emit('newData', current.exportCampaign());
 });
+// socket.on('help sync', function(helpId) {
+  // socket.emit('helping', current.exportCampaign(), helpId);
+  // console.log('helping');
+// });
 
 //Hex uncovered
 socket.on('uncover hex', function(hex) {
@@ -908,7 +912,7 @@ function makeMenus() {
     // unexploredMenu
     $('#reveal').click(function (evt) {
         console.log(selectedHex);
-        socket.emit('uncover hex', selectedHex);
+        socket.emit('uncover hex', selectedHex, current.exportCampaign());
         
         selectedHex.cover.remove();
         current.setExplored(selectedHex.x, selectedHex.y, true);
@@ -925,7 +929,7 @@ function makeMenus() {
     });
     $('#move').click(function (evt) {
         current.removeMarker(selectedMarker);
-        socket.emit('remove marker', selectedMarker);
+        socket.emit('remove marker', selectedMarker, current.exportCampaign());
         console.log(selectedMarker);
         dragMarker(selectedMarker, -10, -10);
         close('#markerMenu', evt);
@@ -944,7 +948,7 @@ function makeMenus() {
     });
     $('#remove').click(function (evt) {
         current.removeMarker(selectedMarker);
-        socket.emit('remove marker', selectedMarker);
+        socket.emit('remove marker', selectedMarker, current.exportCampaign());
         selectedMarker.getElement().remove();
         close('#markerMenu', evt);
     });
@@ -953,7 +957,7 @@ function makeMenus() {
         current.setExplored(selectedHex.x, selectedHex.y, false);
         cover($('#map'), selectedHex.x, selectedHex.y);
         
-        socket.emit('cover hex', selectedHex);
+        socket.emit('cover hex', selectedHex, current.exportCampaign());
         
         close('#exploredMenu', evt);
         //socket.emit('change', current.exportCampaign());
@@ -1018,14 +1022,14 @@ function makeMenus() {
     // titleEditor
     $('#finishLabel').click(function (evt) {
         var newTitle = $('#newTitle').val().replace(/[\r\n]+/g, '<br/>');
-        socket.emit('remove marker', selectedMarker);
+        socket.emit('remove marker', selectedMarker, current.exportCampaign());
         selectedMarker.setTitle(newTitle);
         var textSide = $('input:radio[name=textSide]:checked').val();
         selectedMarker.setTextSide(textSide);
 	var angle = $('#labelAngle').val();
         selectedMarker.setAngle(angle);
         current.saveMarkers();
-        socket.emit('add marker', selectedMarker);
+        socket.emit('add marker', selectedMarker, current.exportCampaign());
         close('#titleEditor', evt);
     });
     $('#cancelLabel').click(function (evt) {
@@ -1122,7 +1126,7 @@ function dragMarker(marker, dx, dy) {
             element.remove();
         }
         preventTouchScroll = false;
-        socket.emit('add marker', marker);
+        socket.emit('add marker', marker, current.exportCampaign());
         console.log(marker);
     });
     
