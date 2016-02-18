@@ -50,6 +50,7 @@ io.on('connection', function(socket){
   socket.on('import', function(campaignData){
     console.log('New data:\n' + campaignData);
     socket.broadcast.emit('import', campaignData);
+    latestData = campaignData;
   });
   socket.on('uncover hex', function(hexInfo, campaignData) {
     latestData = campaignData;
