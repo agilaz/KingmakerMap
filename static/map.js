@@ -1277,6 +1277,7 @@ function addHandlers() {
             }
             selectedHex.x = hexCoord.hexStraight;
             selectedHex.y = hexCoord.hexZigzag;
+            console.log('y:' + selectedHex.y + ' x:' + selectedHex.x);
         }
         evt.stopPropagation();
     });
