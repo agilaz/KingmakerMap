@@ -405,6 +405,10 @@ var Campaign = Class.create({
         $.each(this.store.getArray('explored'), $.proxy(function (index, hexId) {
             this.explored[hexId] = 1;
         }, this));
+        this.claimed = {};
+        $.each(this.store.getArray('claimed'), $.proxy(function (index, hexId) {
+            this.claimed[hexId] = 1;
+        }, this));
         markerData = this.store.getArray('markers');
         this.markerList = [];
         $.each(markerData, $.proxy(function (index, data) {
@@ -445,7 +449,18 @@ var Campaign = Class.create({
 		    }
 		    return straight + '_' + zigzag;
 		});
-	    }
+	    } else if (oldKey == 'claimed') {
+            newValue = $.map(value.split("|"), function (value) {
+                value = parseInt(value);
+                var zigzag = parseInt(value/128);
+                var straight = value - 128*zigzag;
+                if ((straight & 127) > 120) {
+                    zigzag++;
+                    straight -= 128;
+                }
+                return straight + '_' + zigzag;
+            });
+        }
 	    if (newKey || newValue !== undefined) {
 		if (newValue === undefined) {
 		    newValue = value;
@@ -485,6 +500,26 @@ var Campaign = Class.create({
 
     saveExplored: function () {
         this.store.set('explored', Object.keys(this.explored));
+    },
+
+    isClaimed: function (straight, zigzag) {
+        var hexId = this.getHexId(straight, zigzag);
+        return this.claimed[hexId];
+    },
+
+    setClaimed: function (straight, zigzag, claimed) {
+        var hexId = this.getHexId(straight, zigzag);
+        if (claimed) {
+            this.claimed[hexId] = 1;
+        } else {
+            delete(this.claimed[hexId]);
+        }
+        this.saveClaimed();
+        drawBorders();
+    },
+
+    saveClaimed: function () {
+        this.store.set('claimed', Object.keys(this.claimed));
     },
 
     addMarker: function (marker) {
@@ -755,6 +790,51 @@ function coverMap() {
     }
 }
 
+var borderPositions = [
+    {y:-1, x:-1, src:'borderUL'},
+    {y:-1, x:1,  src:'borderUR'},
+    {y:0, x:-2, src:'borderL'},
+];
+
+function xor(a, b) {
+    return (a || b) && !(a && b);
+}
+function border(mapDiv, straight, zigzag) {
+    if (current.verticalHexes) {
+        strideX = current.hexWidth*0.75;
+        strideY = current.hexHeight*0.5;
+        xPos = zigzag * strideX + current.mapOffsetX;
+        yPos = straight * strideY + current.mapOffsetY;
+    } else {
+        strideX = current.hexWidth*0.5;
+        strideY = current.hexHeight*0.75;
+        xPos = straight * strideX + current.mapOffsetX;
+        yPos = zigzag * strideY + current.mapOffsetY;
+    }
+    borderPositions.forEach(function (position) {
+        if (xor(current.isClaimed(straight+position.x, zigzag+position.y), current.isClaimed(straight, zigzag))) {
+            var border = $('<img />');
+            border.attr('src', position.src + '.png');
+            border.css({ 'width': current.hexWidth, 'height': current.hexHeight });
+            border.addClass('border');
+            border.attr('id', position.src + current.getHexId(straight, zigzag));
+            border.css({'left': xPos, 'top': yPos});
+            $(mapDiv).append(border);
+        }
+    });
+
+}
+
+function drawBorders() {
+    Array.from(document.getElementsByClassName('border')).forEach(function (elem) {elem.remove();});
+    var zigzagDelta = (current.halfHex ? 1 : 0);
+    for (var zigzag = zigzagDelta - 1; zigzag <= current.mapMaxZigzag + 1 + zigzagDelta; ++zigzag) {
+        for (var straight = -(zigzag&1); straight <= current.mapMaxStraight; straight += 2) {
+            border($('#map'), straight, zigzag);
+        }
+    }
+}
+
 function close(selector, evt) {
         $(selector).hide();
         evt.preventDefault();
@@ -835,6 +915,16 @@ socket.on('cover hex', function(hex) {
   console.log(hex);
 });
 
+//Hex claimed
+socket.on('claim hex', function(hex) {
+    console.log('claiming ' + hex);
+    current.setClaimed(hex.x, hex.y, true);
+});
+//Hex unclaimed
+socket.on('unclaim hex', function(hex) {
+    console.log('unclaiming ' + hex);
+    current.setClaimed(hex.x, hex.y, false);
+});
 //Party moved
 socket.on('move party', function(partyCoords) {
   current.setPartyCoords(partyCoords.x, partyCoords.y);
@@ -952,16 +1042,44 @@ function makeMenus() {
         selectedMarker.getElement().remove();
         close('#markerMenu', evt);
     });
-    // exploredMenu
-    $('#cover').click(function (evt) {
+    // exploredClaimedMenu
+    $('#ccover').click(function (evt) {
+        current.setClaimed(selectedHex.x, selectedHex.y, false) ;
+        socket.emit('unclaim hex', selectedHex, current.exportCampaign());
+
         current.setExplored(selectedHex.x, selectedHex.y, false);
         cover($('#map'), selectedHex.x, selectedHex.y);
         
         socket.emit('cover hex', selectedHex, current.exportCampaign());
         
-        close('#exploredMenu', evt);
+        close('#exploredClaimedMenu', evt);
         //socket.emit('change', current.exportCampaign());
     });
+    $('#unclaim').click(function (evt) {
+        current.setClaimed(selectedHex.x, selectedHex.y, false) ;
+
+        socket.emit('unclaim hex', selectedHex, current.exportCampaign());
+
+        close('#exploredClaimedMenu', evt);
+    });
+    //exploredUnclaimedMenu
+    $('#ucover').click(function (evt) {
+        current.setExplored(selectedHex.x, selectedHex.y, false);
+        cover($('#map'), selectedHex.x, selectedHex.y);
+
+        socket.emit('cover hex', selectedHex, current.exportCampaign());
+
+        close('#exploredUnclaimedMenu', evt);
+        //socket.emit('change', current.exportCampaign());
+    });
+    $('#claim').click(function (evt) {
+       current.setClaimed(selectedHex.x, selectedHex.y, true) ;
+
+       socket.emit('claim hex', selectedHex, current.exportCampaign());
+
+       close('#exploredUnclaimedMenu', evt);
+    });
+
     // importExportDiv
     $('#importExportClose').click(function (evt) {
         $('#importExportDiv').hide();
@@ -1086,7 +1204,8 @@ function closeAnyMenu() {
         result = true;
     }
     result |= hideIfVisible('#markerMenu');
-    result |= hideIfVisible('#exploredMenu');
+    result |= hideIfVisible('#exploredClaimedMenu');
+    result |= hideIfVisible('#exploredUnclaimedMenu');
     result |= hideIfVisible('#mainMenu');
     return result;
 }
@@ -1268,7 +1387,14 @@ function addHandlers() {
 	    }
             var hexId = current.getHexId(hexCoord.hexStraight, hexCoord.hexZigzag);
             if (current.isExplored(hexCoord.hexStraight, hexCoord.hexZigzag)) {
-                showFloatingMenu('#exploredMenu', { 'left': xPos, 'top': yPos }, 40, 50);
+                var menu;
+                if (current.isClaimed(hexCoord.hexStraight, hexCoord.hexZigzag)) {
+                    menu = '#exploredClaimedMenu';
+                } else {
+                    menu = '#exploredUnclaimedMenu';
+                }
+                console.log(menu);
+                showFloatingMenu(menu, { 'left': xPos, 'top': yPos }, 40, 50);
             } else {
                 showFloatingMenu('#unexploredMenu', { 'left': xPos, 'top': yPos }, 40, 50);
                 var cover = $('#hex' + hexId);
@@ -1500,6 +1626,7 @@ function finishConfiguring(apply) {
     window.setTimeout(function () { $('#map').css({ 'overflow': 'hidden' }); }, 100);
     $('.scalingHex').hide();
     coverMap();
+    drawBorders();
     $('.marker').show();
     $('#party').show();
 }
@@ -1802,6 +1929,7 @@ $(document).ready(function () {
     addHandlers();
     makeIcons();
     coverMap();
+    drawBorders();
     //$('#mapImg').attr('draggable','false');
     fixMenuX();
     socket.emit('need sync', current.exportCampaign());

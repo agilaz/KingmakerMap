@@ -15,7 +15,11 @@
     pointer-events: none;
     z-index: 3;
 }
-
+.border {
+    position: absolute;
+    pointer-events: none;
+    z-index: 4;
+}
 .selectedHex {
     opacity: 0.7;
 }

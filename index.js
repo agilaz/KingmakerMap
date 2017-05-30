@@ -62,6 +62,16 @@ io.on('connection', function(socket){
     console.log('Hex covered: ' + hexInfo.x + ', ' + hexInfo.y);
     socket.broadcast.emit('cover hex', hexInfo);
   });
+  socket.on('claim hex', function(hexInfo, campaignData) {
+    latestData = campaignData;
+    console.log('Hex claimed: ' + hexInfo.x + ', ' + hexInfo.y);
+    socket.broadcast.emit('claim hex', hexInfo);
+  });
+  socket.on('unclaim hex', function(hexInfo, campaignData) {
+    latestData = campaignData;
+    console.log('Hex unclaimed: ' + hexInfo.x + ', ' + hexInfo.y);
+    socket.broadcast.emit('unclaim hex', hexInfo);
+  });
   socket.on('move party', function(partyCoords) {
     console.log('Party moved: ' + partyCoords.x + ', ' + partyCoords.y);
     socket.broadcast.emit('move party', partyCoords);
