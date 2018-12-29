@@ -3,6 +3,13 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+
+var getVersion = (campaignData) => {
+    var lineIndex = campaignData.indexOf('mapVersion');
+    var versionStr = campaignData.substring(campaignData.indexOf(':', lineIndex) + 1, campaignData.indexOf('\n', lineIndex));
+    return parseInt(versionStr) || -1;
+  };
+
 app.use(express.static(__dirname + '/static'));
 
 app.get('/', function(req, res){
@@ -12,6 +19,7 @@ app.get('/', function(req, res){
 
 var clients = [];
 var latestData = '';
+var latestVersion = -1;
 
 io.on('connection', function(socket){
   
@@ -29,9 +37,11 @@ io.on('connection', function(socket){
       // clients[0].emit('help sync', helpId);
     // }
     console.log('NEW CAMPAIGN DATA FROM ' + socket + '\n' + currentData + '\n');
-    if(latestData.length > currentData.length) socket.emit('import', latestData);
-    else if (latestData != currentData){
+    var version = getVersion(currentData);
+    if (latestVersion > version) socket.emit('import', latestData);
+    else if (latestVersion < version && latestData !== currentData){
       latestData = currentData;
+      latestVersion = version;
       socket.broadcast.emit('import',currentData);
     }
     console.log('Latest data:\n' + latestData);
@@ -49,8 +59,12 @@ io.on('connection', function(socket){
   
   socket.on('import', function(campaignData){
     console.log('New data:\n' + campaignData);
-    socket.broadcast.emit('import', campaignData);
-    latestData = campaignData;
+    var version = getVersion(campaignData);
+    if (version > latestVersion) {
+      socket.broadcast.emit('import', campaignData);
+      latestData = campaignData;
+      latestVersion = version;
+    }
   });
   socket.on('uncover hex', function(hexInfo, campaignData) {
     latestData = campaignData;

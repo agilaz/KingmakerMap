@@ -427,6 +427,8 @@ var Campaign = Class.create({
             this.partyX = 500;
             this.partyY = 150;
         }
+        var version = this.store.get('mapVersion');
+        this.setMapVersion(version || 0);
         this.revertMapDetails();
     },
 
@@ -557,6 +559,19 @@ var Campaign = Class.create({
         this.store.set('searched', Object.keys(this.searched));
     },
 
+    getMapVersion: function () {
+        return this.mapVersion;
+    },
+
+    setMapVersion: function(version) {
+        this.mapVersion = version;
+        this.saveMapVersion();
+    },
+
+    saveMapVersion: function() {
+        this.store.set('mapVersion', this.mapVersion);
+    },
+
     addMarker: function (marker) {
         this.markerList.push(marker);
         this.saveMarkers();
@@ -626,6 +641,7 @@ var Campaign = Class.create({
         this.store.set('hexHeight', this.hexHeight);
         this.store.set('mapMaxStraight', this.mapMaxStraight);
         this.store.set('mapMaxZigzag', this.mapMaxZigzag);
+        this.store.set('mapVersion', this.mapVersion);
     },
 
     revertMapDetails: function () {
