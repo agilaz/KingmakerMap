@@ -2,7 +2,7 @@ String.prototype.toId = function() {
     return this.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-var url = "https://hthskingmaker.herokuapp.com/";
+var url = "https://hths-kingmaker.onrender.com/";
 var socket = io.connect(url);
 
 var editing = false;
